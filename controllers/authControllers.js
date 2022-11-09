@@ -5,25 +5,24 @@ const notifications = require("../constants/notifications");
 const authControllers = {
   register: async (req, res) => {
     try {
-      const { fullName, userName, email, password, gender } = req.body;
+      const { userName, email, password, gender } = req.body;
       let newUserName = userName.toLowerCase().replace(/ /g, "");
 
-      const userNameIsExist = await Users.findOne({ userName: newUserName });
       const emailIsExist = await Users.findOne({ email });
 
-      if (userNameIsExist) {
-        return res.status(400).send({ msg: notifications.userNameExist });
-      }
       if (emailIsExist) {
-        return res.status(400).send({ msg: notifications.emailExist });
+        return res
+          .status(200)
+          .json({ status: false, msg: notifications.emailExist });
       }
       if (password.length < 8 || password.length > 32) {
-        return res.status(400).send({ msg: notifications.lengthPassword });
+        return res
+          .status(200)
+          .json({ status: false, msg: notifications.lengthPassword });
       }
       const passwordHash = await brcypt.hash(password, 12);
 
       const userNew = new Users({
-        fullName,
         userName: newUserName,
         email,
         password: passwordHash,
@@ -38,16 +37,14 @@ const authControllers = {
         maxAge: 30 * 24 * 60 * 60 * 1000,
       });
       await userNew.save();
-      res.json({
+
+      return res.json({
+        status: true,
         msg: notifications.registerSuccess,
         accessToken,
         data: { ...userNew._doc, password: "" },
       });
     } catch (error) {
-      console.log(
-        "🚀 ~ file: authControllers.js ~ line 47 ~ register: ~ error",
-        error
-      );
       return res.status(500).send({ msg: notifications.severErr });
     }
   },
@@ -59,11 +56,15 @@ const authControllers = {
         "-password"
       );
       if (!user) {
-        return res.status(400).json({ msg: notifications.emailNotExist });
+        return res
+          .status(200)
+          .json({ msg: notifications.emailNotExist, status: false });
       }
       const isMatch = await brcypt.compare(password, user.password);
       if (!isMatch) {
-        return res.status(400).json({ msg: notifications.passwordNotMatch });
+        return res
+          .status(200)
+          .json({ msg: notifications.passwordNotMatch, status: false });
       }
       const accessToken = createAccessToken({ id: user.id });
       const refreshAccessToken = createRefreshAccessToken({ id: user.id });
@@ -76,6 +77,7 @@ const authControllers = {
       res.json({
         msg: notifications.loginSuccess,
         accessToken,
+        status: true,
         data: { ...user._doc, password: "" },
       });
     } catch (error) {
@@ -94,6 +96,7 @@ const authControllers = {
   generateAccessToken: async (req, res) => {
     try {
       const refreshToken = req.cookies.refreshToken;
+      console.log("~ refreshToken", refreshToken);
       if (!refreshToken) {
         return res.status(400).json({ msg: "Please login now." });
       }
