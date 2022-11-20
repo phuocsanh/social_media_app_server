@@ -25,7 +25,7 @@ ExpressPeerServer(http, { path: "/" });
 
 // Routes
 app.use("/api", require("./routes/authRouters"));
-// app.use("/api", require("./routes/userRouter"));
+app.use("/api", require("./routes/userRouters"));
 // app.use("/api", require("./routes/postRouter"));
 // app.use("/api", require("./routes/commentRouter"));
 // app.use("/api", require("./routes/notifyRouter"));
