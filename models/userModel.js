@@ -28,6 +28,13 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "https://cdn-icons-png.flaticon.com/128/1177/1177568.png",
     },
+    listPicture: [
+      {
+        type: Object,
+        default: "",
+      },
+    ],
+    listFriends: [{ type: mongoose.Types.ObjectId, default: "", ref: "Users" }],
     role: {
       type: String,
       default: "user",
@@ -47,10 +54,8 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
-    story: {
-      type: String,
-      default: "",
-    },
+    story: [{ type: mongoose.Types.ObjectId, ref: "Stories" }],
+
     website: {
       type: String,
       default: "",

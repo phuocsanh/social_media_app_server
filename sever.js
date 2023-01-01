@@ -2,12 +2,26 @@ require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const bodyParser = require("body-parser");
+const fileupload = require("express-fileupload");
+
 const cookieParser = require("cookie-parser");
 // const SocketServer = require("./socketServer");
 const { ExpressPeerServer } = require("peer");
 const path = require("path");
 
 const app = express();
+app.use(fileupload({ useTempFiles: true }));
+
+app.use(bodyParser.json({ limit: "50mb", extended: true }));
+app.use(
+  bodyParser.urlencoded({
+    limit: "200mb",
+    extended: true,
+    parameterLimit: 50000,
+  })
+);
+app.use(bodyParser.text({ limit: "200mb" }));
 app.use(express.json());
 app.use(cors({ credentials: true, origin: "http://localhost:3000" }));
 app.use(cookieParser());

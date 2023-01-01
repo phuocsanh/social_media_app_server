@@ -2,6 +2,7 @@ const jwt = require("jsonwebtoken");
 const Users = require("../models/userModel");
 const authMiddlewares = {
   auth: async (req, res, next) => {
+    console.log("~ file: authMiddlewares.js:5 ~ auth: ~ auth");
     try {
       const token = req.header("Authorization");
       if (!token) {
@@ -15,6 +16,7 @@ const authMiddlewares = {
       req.user = user;
       next();
     } catch (error) {
+      console.log("~ file: authMiddlewares.js:19 ~ auth: ~ error", error);
       return res.status(500).json({ msg: "Sever error" + error.message });
     }
   },
